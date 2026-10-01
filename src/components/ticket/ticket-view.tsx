@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Flyer } from "@/components/flyer";
 import { fullDate, hideCpf, maskCpf } from "@/lib/format";
 import { STATUS_LABEL } from "@/lib/labels";
-import { isActive, ticketToken, uid, useHydrated, useStore } from "@/lib/store";
+import { CustomerLogin } from "@/components/auth/customer-login";
+import { isActive, ticketToken, uid, useCustomer, useHydrated, useStaff, useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 function Burst() {
@@ -47,6 +48,8 @@ export function TicketView({ id }: { id: string }) {
   const [guestName, setGuestName] = useState("");
   const [guestCpf, setGuestCpf] = useState("");
   const [now] = useState(() => Date.now());
+  const customer = useCustomer();
+  const staff = useStaff();
 
   if (!hydrated) return <div className="mx-auto mt-20 h-96 max-w-md animate-pulse rounded-3xl bg-white/5" />;
   if (!r || !event || !space)
@@ -56,6 +59,27 @@ export function TicketView({ id }: { id: string }) {
         <Link href="/minhas-reservas" className="mt-3 inline-block text-primary">
           Ver minhas reservas
         </Link>
+      </div>
+    );
+
+  // o QR Code é a entrada: só quem fez a reserva (ou a equipe) pode ver
+  const allowed = !!staff || (!!customer && r.customerId === customer.id);
+  if (!allowed)
+    return (
+      <div className="mx-auto max-w-sm px-4 py-12">
+        {customer ? (
+          <div className="glass rounded-3xl p-6 text-center">
+            <p className="font-display text-2xl">Esta reserva é de outra conta</p>
+            <p className="mt-2 text-sm text-muted-foreground">Entre com a conta que fez a reserva para ver o QR Code.</p>
+            <Link href="/minhas-reservas" className="mt-4 inline-block text-sm underline">
+              Ver minhas reservas
+            </Link>
+          </div>
+        ) : (
+          <div className="glass rounded-3xl p-6">
+            <CustomerLogin title="Entre para ver sua reserva" subtitle="Use o mesmo WhatsApp ou e-mail da reserva." onDone={() => {}} />
+          </div>
+        )}
       </div>
     );
 

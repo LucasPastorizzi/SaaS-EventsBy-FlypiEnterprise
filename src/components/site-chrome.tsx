@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { AtSign, MessageCircle, Ticket } from "lucide-react";
+import { AtSign, MessageCircle } from "lucide-react";
+import { AccountMenu } from "@/components/auth/account-menu";
 import { InnLogo } from "@/components/brand";
 import { VENUE } from "@/lib/mock-data";
 
@@ -9,13 +10,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
         <InnLogo className="text-base" />
         <nav className="flex items-center gap-2">
-          <Link
-            href="/minhas-reservas"
-            className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/10 px-3 text-sm text-muted-foreground transition hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-          >
-            <Ticket className="size-4" /> <span className="hidden sm:inline">Minhas reservas</span>
-            <span className="sm:hidden">Reservas</span>
-          </Link>
+          <AccountMenu />
           <Link
             href="/#noites"
             className="hidden h-9 items-center rounded-full bg-white px-4 text-sm font-semibold text-black transition hover:bg-white/85 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none sm:inline-flex"
@@ -47,7 +42,12 @@ export function SiteFooter() {
           </a>
         </div>
       </div>
-      <p className="mx-auto mt-6 max-w-6xl px-4 text-xs text-muted-foreground/70">Sistema de reservas por Flypi Enterprise</p>
+      <div className="mx-auto mt-6 flex max-w-6xl justify-between gap-4 px-4 text-xs text-muted-foreground/70">
+        <p>Sistema de reservas por Flypi Enterprise</p>
+        <Link href="/equipe/entrar" className="hover:text-foreground">
+          Acesso da equipe
+        </Link>
+      </div>
     </footer>
   );
 }

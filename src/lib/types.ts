@@ -110,8 +110,8 @@ export interface Reservation {
   decidedAt?: string;
   checkedInAt?: string;
   ticketNonce: string;
-  /** reserva criada neste navegador (área do cliente) */
-  mine?: boolean;
+  /** conta do cliente que fez a reserva pelo site */
+  customerId?: string;
 }
 
 export interface Customer {
@@ -120,4 +120,27 @@ export interface Customer {
   phone: string;
   reservations: number;
   lastVisit: string;
+}
+
+export interface CustomerAccount {
+  id: string;
+  name: string;
+  phone?: string; // só dígitos com DDD
+  email?: string;
+  marketing: boolean;
+  createdAt: string;
+}
+
+/** dono: tudo · gerente: reservas e noites · portaria: só o leitor de QR */
+export type StaffRole = "dono" | "gerente" | "portaria";
+
+export interface StaffUser {
+  id: string;
+  name: string;
+  email: string;
+  role: StaffRole;
+  /** demo: SHA-256 de "inn:email:senha". No backend real, quem guarda a senha é o Supabase Auth. */
+  passwordHash: string;
+  active: boolean;
+  createdAt: string;
 }

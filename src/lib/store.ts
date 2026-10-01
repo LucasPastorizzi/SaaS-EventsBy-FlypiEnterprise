@@ -7,8 +7,9 @@ import { useEffect, useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { toast } from "sonner";
-import { EVENTS, MAPS, SPACES, VENUE, randomName, seeded } from "./mock-data";
-import type { EventItem, Guest, Reservation, Space, SpaceStatus, Venue, VenueMap } from "./types";
+import { hashPassword, onlyDigits, signOutMarker } from "./auth";
+import { EVENTS, MAPS, SPACES, STAFF, VENUE, randomName, seeded } from "./mock-data";
+import type { CustomerAccount, EventItem, Guest, Reservation, Space, SpaceStatus, StaffUser, Venue, VenueMap } from "./types";
 
 /** status que ocupam o camarote (mesma regra do índice único que o banco terá) */
 const ACTIVE: Reservation["status"][] = ["bloqueio", "aguardando", "confirmada", "check_in"];
@@ -85,8 +86,25 @@ interface State {
   reservations: Reservation[];
   blocks: Record<string, string[]>;
   offlineQueue: number;
+  customers: CustomerAccount[];
+  staff: StaffUser[];
+  /** id da conta do cliente logado neste navegador */
+  customerSession: string | null;
+  /** id da pessoa da equipe logada neste navegador */
+  staffSession: string | null;
 
-  createHold: (eventId: string, spaceId: string) => { ok: true; reservation: Reservation } | { ok: false; error: string };
+  findCustomer: (contact: { phone?: string; email?: string }) => CustomerAccount | undefined;
+  signInCustomer: (customerId: string) => void;
+  createCustomer: (input: { name: string; phone?: string; email?: string; marketing: boolean }) => CustomerAccount;
+  updateCustomer: (id: string, patch: Partial<Omit<CustomerAccount, "id">>) => void;
+  signOutCustomer: () => void;
+  signInStaff: (email: string, password: string) => Promise<{ ok: true; user: StaffUser } | { ok: false; error: string }>;
+  signOutStaff: () => void;
+  addStaff: (input: { name: string; email: string; role: StaffUser["role"]; password: string }) => Promise<{ ok: boolean; error?: string }>;
+  updateStaff: (id: string, patch: Partial<Pick<StaffUser, "role" | "active" | "name">>) => void;
+  removeStaff: (id: string) => void;
+
+  createHold: (eventId: string, spaceId: string, customerId: string) => { ok: true; reservation: Reservation } | { ok: false; error: string };
   releaseHold: (reservationId: string) => void;
   submitRequest: (reservationId: string, input: RequestInput) => Reservation | undefined;
   expireHolds: () => string[];
@@ -119,6 +137,10 @@ const initial = () => ({
   reservations: seedReservations(),
   blocks: { e_sexta: ["r5"], e_sabado: [], e_rooftop: [] } as Record<string, string[]>,
   offlineQueue: 0,
+  customers: [] as CustomerAccount[],
+  staff: STAFF,
+  customerSession: null as string | null,
+  staffSession: null as string | null,
 });
 
 const occupied = (list: Reservation[], eventId: string, spaceId: string) => list.some((r) => r.eventId === eventId && r.spaceId === spaceId && ACTIVE.includes(r.status));
@@ -128,7 +150,59 @@ export const useStore = create<State>()(
     (set, get) => ({
       ...initial(),
 
-      createHold: (eventId, spaceId) => {
+      findCustomer: ({ phone, email }) => {
+        const p = phone ? onlyDigits(phone) : undefined;
+        const e = email?.trim().toLowerCase();
+        return get().customers.find((c) => (p && c.phone === p) || (e && c.email === e));
+      },
+
+      signInCustomer: (customerId) => set({ customerSession: customerId }),
+
+      createCustomer: ({ name, phone, email, marketing }) => {
+        const c: CustomerAccount = {
+          id: uid("cl_"),
+          name: name.trim(),
+          phone: phone ? onlyDigits(phone) : undefined,
+          email: email?.trim().toLowerCase() || undefined,
+          marketing,
+          createdAt: new Date().toISOString(),
+        };
+        set((s) => ({ customers: [...s.customers, c], customerSession: c.id }));
+        return c;
+      },
+
+      updateCustomer: (id, patch) => set((s) => ({ customers: s.customers.map((c) => (c.id === id ? { ...c, ...patch } : c)) })),
+
+      signOutCustomer: () => set({ customerSession: null }),
+
+      signInStaff: async (email, password) => {
+        const user = get().staff.find((u) => u.email === email.trim().toLowerCase());
+        const hash = await hashPassword(email, password);
+        // mesma mensagem para e-mail inexistente e senha errada (não revela quem tem conta)
+        if (!user || user.passwordHash !== hash) return { ok: false, error: "E-mail ou senha incorretos." };
+        if (!user.active) return { ok: false, error: "Este acesso foi desativado. Fale com o dono da casa." };
+        set({ staffSession: user.id });
+        return { ok: true, user };
+      },
+
+      signOutStaff: () => {
+        signOutMarker.at = Date.now();
+        set({ staffSession: null });
+      },
+
+      addStaff: async ({ name, email, role, password }) => {
+        const e = email.trim().toLowerCase();
+        if (get().staff.some((u) => u.email === e)) return { ok: false, error: "Já existe alguém com esse e-mail." };
+        const user: StaffUser = { id: uid("st_"), name: name.trim(), email: e, role, passwordHash: await hashPassword(e, password), active: true, createdAt: new Date().toISOString() };
+        set((s) => ({ staff: [...s.staff, user] }));
+        return { ok: true };
+      },
+
+      updateStaff: (id, patch) => set((s) => ({ staff: s.staff.map((u) => (u.id === id ? { ...u, ...patch } : u)) })),
+
+      removeStaff: (id) => set((s) => ({ staff: s.staff.filter((u) => u.id !== id) })),
+
+      createHold: (eventId, spaceId, customerId) => {
         get().expireHolds();
         const { reservations, blocks, events, spaces, venue } = get();
         const ev = events.find((e) => e.id === eventId);
@@ -152,11 +226,14 @@ export const useStore = create<State>()(
           holdExpiresAt: new Date(Date.now() + venue.holdMinutes * 60_000).toISOString(),
           createdAt: new Date().toISOString(),
           ticketNonce: uid(),
-          mine: true,
+          customerId,
         };
         // um camarote por cliente por noite: trocar de camarote libera o anterior
         set({
-          reservations: [...reservations.map((r) => (r.mine && r.eventId === eventId && r.status === "bloqueio" ? { ...r, status: "expirada" as const } : r)), reservation],
+          reservations: [
+            ...reservations.map((r) => (r.customerId === customerId && r.eventId === eventId && r.status === "bloqueio" ? { ...r, status: "expirada" as const } : r)),
+            reservation,
+          ],
         });
         return { ok: true, reservation };
       },
@@ -258,7 +335,7 @@ export const useStore = create<State>()(
       simulateActivity: (eventId, avoid) => {
         const { spaces, reservations, blocks } = get();
         const free = spaces.filter((s) => s.bookable && s.id !== avoid && !blocks[eventId]?.includes(s.id) && !occupied(reservations, eventId, s.id));
-        const pending = reservations.find((r) => r.eventId === eventId && !r.mine && r.status === "aguardando" && r.spaceId !== avoid);
+        const pending = reservations.find((r) => r.eventId === eventId && !r.customerId && r.status === "aguardando" && r.spaceId !== avoid);
         if (pending && Math.random() < 0.4) {
           set({ reservations: reservations.map((r) => (r.id === pending.id ? { ...r, status: "confirmada", decidedAt: new Date().toISOString() } : r)) });
           return { label: spaces.find((s) => s.id === pending.spaceId)?.label ?? "", status: "reservado" };
@@ -294,7 +371,8 @@ export const useStore = create<State>()(
       updateMap: (map) => set((s) => ({ maps: s.maps.map((m) => (m.id === map.id ? map : m)) })),
       upsertEvent: (event) => set((s) => ({ events: s.events.some((e) => e.id === event.id) ? s.events.map((e) => (e.id === event.id ? event : e)) : [...s.events, event] })),
       updateVenue: (patch) => set((s) => ({ venue: { ...s.venue, ...patch } })),
-      resetDemo: () => set(initial()),
+      // mantém quem está logado; volta todo o resto ao estado inicial
+      resetDemo: () => set((s) => ({ ...initial(), staffSession: s.staffSession, customers: s.customers, customerSession: s.customerSession })),
     }),
     {
       name: "inn-reservas-demo",
@@ -329,6 +407,10 @@ export const useStore = create<State>()(
         reservations: s.reservations,
         blocks: s.blocks,
         offlineQueue: s.offlineQueue,
+        customers: s.customers,
+        staff: s.staff,
+        customerSession: s.customerSession,
+        staffSession: s.staffSession,
       }),
     },
   ),
@@ -361,3 +443,13 @@ export function statusOf(eventId: string, spaceId: string, reservations: Reserva
 
 export const isActive = (r: Reservation) => ACTIVE.includes(r.status);
 export const isConfirmed = (r: Reservation) => CONFIRMED.includes(r.status);
+
+/** Conta do cliente logado (ou undefined). */
+export function useCustomer() {
+  return useStore((s) => s.customers.find((c) => c.id === s.customerSession));
+}
+
+/** Pessoa da equipe logada (ou undefined); ignora acessos desativados. */
+export function useStaff() {
+  return useStore((s) => s.staff.find((u) => u.id === s.staffSession && u.active));
+}

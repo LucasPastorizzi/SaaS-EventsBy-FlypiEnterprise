@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { CalendarDays, ExternalLink, LayoutDashboard, Map, Menu, ScanLine, Settings, Ticket } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { CalendarDays, ExternalLink, LayoutDashboard, LogOut, Map, Menu, ScanLine, Settings, Ticket } from "lucide-react";
 import { InnLogo } from "@/components/brand";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { useHydrated, useStore } from "@/lib/store";
+import { StaffGuard } from "@/components/auth/staff-guard";
+import { ROLE_LABEL, canAccess } from "@/lib/auth";
+import { initials } from "@/lib/format";
+import { useStaff, useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -19,7 +22,10 @@ const NAV = [
 
 function Nav({ onNavigate }: { onNavigate?: () => void }) {
   const path = usePathname();
+  const router = useRouter();
+  const staff = useStaff();
   const pending = useStore((s) => s.reservations.filter((r) => r.status === "aguardando").length);
+  const items = staff ? NAV.filter((n) => canAccess(staff.role, n.href)) : [];
   return (
     <div className="flex h-full flex-col">
       <div className="px-4 pt-5 pb-1">
@@ -27,7 +33,7 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
       </div>
       <p className="mb-4 px-4 text-xs text-muted-foreground">Painel de reservas</p>
       <nav className="flex-1 space-y-0.5 px-3" aria-label="Painel">
-        {NAV.map(({ href, label, icon: Icon }) => {
+        {items.map(({ href, label, icon: Icon }) => {
           const active = href === "/painel" ? path === href : path.startsWith(href);
           return (
             <Link
@@ -54,15 +60,35 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
         <Link href="/" className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
           <ExternalLink className="size-4" /> Ver página pública
         </Link>
+        {staff && (
+          <div className="mt-2 flex items-center gap-2.5 rounded-xl bg-white/[0.04] p-2.5">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-white text-xs font-bold text-black">{initials(staff.name)}</span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">{staff.name}</p>
+              <p className="text-xs text-muted-foreground">{ROLE_LABEL[staff.role]}</p>
+            </div>
+            <button
+              onClick={() => {
+                useStore.getState().signOutStaff();
+                router.replace("/equipe/entrar");
+              }}
+              aria-label="Sair"
+              title="Sair"
+              className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-white/10 hover:text-foreground"
+            >
+              <LogOut className="size-4" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
-  useHydrated();
   const [open, setOpen] = useState(false);
   return (
+    <StaffGuard>
     <div className="flex min-h-screen">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-white/5 bg-sidebar lg:block">
         <Nav />
@@ -83,6 +109,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <main className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">{children}</main>
       </div>
     </div>
+    </StaffGuard>
   );
 }
 

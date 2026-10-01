@@ -1,7 +1,7 @@
 // Dados de demonstração do INN Lounge Bar. Nada aqui vem de banco: quando o
 // backend entrar, estas constantes viram chamadas de API com os mesmos formatos.
 // Line-ups e nomes de clientes são fictícios.
-import type { EventItem, Space, Venue, VenueMap } from "./types";
+import type { EventItem, Space, StaffUser, Venue, VenueMap } from "./types";
 
 export const VENUE: Venue = {
   name: "INN Lounge Bar",
@@ -223,3 +223,23 @@ const LAST = ["Schmidt", "Souza", "Oliveira", "Kunz", "Müller", "Ribeiro", "Car
 export function randomName(rand: () => number) {
   return `${FIRST[Math.floor(rand() * FIRST.length)]} ${LAST[Math.floor(rand() * LAST.length)]}`;
 }
+
+/**
+ * Equipe de demonstração. As senhas estão no README (seção "Acessos de
+ * demonstração"); aqui fica só o hash.
+ */
+export const STAFF: StaffUser[] = [
+  { id: "st_dono", name: "Dono do INN", email: "dono@inn.demo", role: "dono", passwordHash: "94970424af8ddd9dcc63a2304b10c45f5e9d0b39dd85c0a9d460277ba173939b", active: true, createdAt: "2026-01-01T00:00:00.000Z" },
+  { id: "st_gerente", name: "Gerência", email: "gerente@inn.demo", role: "gerente", passwordHash: "45fa3fff4c152a1c89ba6e6aac4df14277a8394b0c137f0f99a9683dbf2136a1", active: true, createdAt: "2026-01-01T00:00:00.000Z" },
+  { id: "st_portaria", name: "Equipe da entrada", email: "portaria@inn.demo", role: "portaria", passwordHash: "f549c89717be60914c69a71547cc0e2b0a27ec1ada2a5a2292b84c0784a66884", active: true, createdAt: "2026-01-01T00:00:00.000Z" },
+];
+
+/**
+ * Atalhos de login da tela da equipe, só para a demonstração.
+ * Remover (deixar a lista vazia) antes de colocar no ar com backend.
+ */
+export const DEMO_STAFF_LOGINS: { role: StaffUser["role"]; email: string; password: string }[] = [
+  { role: "dono", email: "dono@inn.demo", password: "InnDono#2026" },
+  { role: "gerente", email: "gerente@inn.demo", password: "InnGerente#2026" },
+  { role: "portaria", email: "portaria@inn.demo", password: "InnPortaria#2026" },
+];

@@ -14,8 +14,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Flyer } from "@/components/flyer";
 import { StatusLegend, VenueMap } from "@/components/venue/venue-map";
 import { countdown, fullDate, hideCpf, maskCpf, maskPhone } from "@/lib/format";
-import { statusOf, uid, useHydrated, useStore } from "@/lib/store";
-import type { Guest, Space } from "@/lib/types";
+import { statusOf, uid, useCustomer, useHydrated, useStore } from "@/lib/store";
+import type { CustomerAccount, Guest, Space } from "@/lib/types";
+import { CustomerLogin } from "@/components/auth/customer-login";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { EventPhotos } from "./event-photos";
 import { SpacePanel } from "./space-panel";
@@ -36,10 +38,9 @@ interface Draft {
   occasion: string;
   notes: string;
   terms: boolean;
-  marketing: boolean;
   guests: Guest[];
 }
-const emptyDraft: Draft = { name: "", phone: "", email: "", occasion: "Só curtir", notes: "", terms: false, marketing: false, guests: [] };
+const emptyDraft: Draft = { name: "", phone: "", email: "", occasion: "Só curtir", notes: "", terms: false, guests: [] };
 
 const dadosValid = (d: Draft) => d.name.trim().length > 2 && d.phone.replace(/\D/g, "").length >= 10 && /\S+@\S+\.\S+/.test(d.email) && d.terms;
 
@@ -60,11 +61,13 @@ export function BookingFlow({ eventSlug }: { eventSlug: string }) {
   const [party, setParty] = useState(8);
   const [step, setStep] = useState<Step>("camarote");
   const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const customer = useCustomer();
   const [guestName, setGuestName] = useState("");
   const [guestCpf, setGuestCpf] = useState("");
   const [now, setNow] = useState(() => Date.now());
 
-  const hold = reservations.find((r) => r.mine && r.eventId === event?.id && r.status === "bloqueio");
+  const hold = customer ? reservations.find((r) => r.customerId === customer.id && r.eventId === event?.id && r.status === "bloqueio") : undefined;
   const holdSpace = hold ? allSpaces.find((s) => s.id === hold.spaceId) : undefined;
   const msLeft = hold?.holdExpiresAt ? new Date(hold.holdExpiresAt).getTime() - now : 0;
 
@@ -114,19 +117,37 @@ export function BookingFlow({ eventSlug }: { eventSlug: string }) {
   const stepIdx = STEPS.findIndex((s) => s.key === step);
   const partySize = Math.min(party, holdSpace?.capacity ?? party);
 
-  const reserve = () => {
+  // vai para "Seus dados" já com o que a conta tem (nome, WhatsApp, e-mail)
+  const toDados = (c: CustomerAccount | undefined = customer) => {
+    if (c)
+      setDraft((d) => ({
+        ...d,
+        name: d.name || c.name,
+        phone: d.phone || (c.phone ? maskPhone(c.phone) : ""),
+        email: d.email || c.email || "",
+        terms: true, // aceitos ao criar a conta
+      }));
+    setStep("dados");
+  };
+
+  const reserve = (c: CustomerAccount | undefined = customer) => {
     if (!selected) return;
+    // precisa estar logado para separar o camarote
+    if (!c) {
+      setLoginOpen(true);
+      return;
+    }
     if (hold?.spaceId === selected.id) {
-      setStep("dados");
+      toDados(c);
       setSelected(null);
       return;
     }
-    const res = createHold(event.id, selected.id);
+    const res = createHold(event.id, selected.id, c.id);
     if (!res.ok) {
       toast.error(res.error);
       return;
     }
-    setStep("dados");
+    toDados(c);
     setSelected(null);
   };
 
@@ -257,13 +278,13 @@ export function BookingFlow({ eventSlug }: { eventSlug: string }) {
           <aside className="hidden md:block">
             <div className="glass sticky top-36 rounded-2xl p-4">
               {selected ? (
-                <SpacePanel space={selected} status={statusFor(selected)} party={party} setParty={setParty} onReserve={reserve} isMine={hold?.spaceId === selected.id} />
+                <SpacePanel space={selected} status={statusFor(selected)} party={party} setParty={setParty} onReserve={() => reserve()} isMine={hold?.spaceId === selected.id} />
               ) : (
                 <div className="py-10 text-center">
                   <p className="font-display text-2xl">Escolha seu camarote</p>
                   <p className="mt-1 text-sm text-muted-foreground">Toque em um camarote verde no mapa. Use as abas para ver o salão e a cobertura.</p>
                   {hold && (
-                    <Button className="mt-4" onClick={() => setStep("dados")}>
+                    <Button className="mt-4" onClick={() => toDados()}>
                       Continuar com {holdSpace?.label}
                     </Button>
                   )}
@@ -293,13 +314,13 @@ export function BookingFlow({ eventSlug }: { eventSlug: string }) {
                 <button onClick={() => setSelected(null)} aria-label="Fechar" className="absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-white/10">
                   <X className="size-4" />
                 </button>
-                <SpacePanel space={selected} status={statusFor(selected)} party={party} setParty={setParty} onReserve={reserve} isMine={hold?.spaceId === selected.id} />
+                <SpacePanel space={selected} status={statusFor(selected)} party={party} setParty={setParty} onReserve={() => reserve()} isMine={hold?.spaceId === selected.id} />
               </motion.div>
             )}
           </AnimatePresence>
           {!selected && hold && (
             <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-background/90 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden">
-              <Button className="h-12 w-full text-base" onClick={() => setStep("dados")}>
+              <Button className="h-12 w-full text-base" onClick={() => toDados()}>
                 Continuar com {holdSpace?.label}
               </Button>
             </div>
@@ -349,16 +370,14 @@ export function BookingFlow({ eventSlug }: { eventSlug: string }) {
                   <Label htmlFor="notes">Recado para a casa (opcional)</Label>
                   <Textarea id="notes" rows={2} placeholder="Ex.: vamos chegar por volta das 23h, é aniversário da Ana." value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} />
                 </div>
-                <label className="flex items-start gap-2.5 text-sm">
-                  <Checkbox checked={draft.terms} onCheckedChange={(v) => setDraft({ ...draft, terms: !!v })} className="mt-0.5" />
-                  <span>
-                    Li e aceito as regras da casa e a <a className="underline">política de privacidade</a>.
-                  </span>
-                </label>
-                <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                  <Checkbox checked={draft.marketing} onCheckedChange={(v) => setDraft({ ...draft, marketing: !!v })} className="mt-0.5" />
-                  <span>Quero receber a programação do INN pelo WhatsApp (opcional).</span>
-                </label>
+                {!customer && (
+                  <label className="flex items-start gap-2.5 text-sm">
+                    <Checkbox checked={draft.terms} onCheckedChange={(v) => setDraft({ ...draft, terms: !!v })} className="mt-0.5" />
+                    <span>
+                      Li e aceito as regras da casa e a <a className="underline">política de privacidade</a>.
+                    </span>
+                  </label>
+                )}
               </div>
             )}
 
@@ -481,6 +500,19 @@ export function BookingFlow({ eventSlug }: { eventSlug: string }) {
           </div>
         )
       )}
+      <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogTitle className="sr-only">Entrar para reservar</DialogTitle>
+          <CustomerLogin
+            title="Entre para reservar"
+            subtitle="Assim a confirmação e o QR Code ficam na sua conta. Sem senha: mandamos um código."
+            onDone={(c) => {
+              setLoginOpen(false);
+              reserve(c);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

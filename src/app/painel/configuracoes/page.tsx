@@ -3,17 +3,13 @@
 import { RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/admin-shell";
+import { TeamManager } from "@/components/admin/team-manager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
 
-const TEAM = [
-  { name: "Você", role: "Administrador" },
-  { name: "Gerência", role: "Confirma reservas e faz check-in" },
-  { name: "Equipe da entrada", role: "Só leitura de QR Code (portaria)" },
-];
 
 function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
@@ -81,18 +77,8 @@ export default function SettingsPage() {
         </div>
       </Section>
 
-      <Section title="Equipe e permissões" description="Cada pessoa vê só o que precisa.">
-        <ul className="divide-y divide-white/5 rounded-xl border border-white/8">
-          {TEAM.map((m) => (
-            <li key={m.name} className="flex items-center justify-between px-3 py-2.5 text-sm">
-              <span>{m.name}</span>
-              <span className="text-muted-foreground">{m.role}</span>
-            </li>
-          ))}
-        </ul>
-        <Button variant="outline" size="sm" className="w-fit" onClick={() => toast.info("Convites para a equipe entram junto com o login.")}>
-          Convidar pessoa
-        </Button>
+      <Section title="Equipe e acessos" description="Quem entra no painel e na portaria, e o que cada um pode fazer.">
+        <TeamManager />
       </Section>
 
       <Section title="Dados da demonstração" description="Volta reservas, noites, mapa e textos ao estado inicial.">

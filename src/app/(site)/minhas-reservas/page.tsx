@@ -6,7 +6,8 @@ import { ChevronRight, Ticket } from "lucide-react";
 import { Flyer } from "@/components/flyer";
 import { fullDate } from "@/lib/format";
 import { STATUS_LABEL } from "@/lib/labels";
-import { useHydrated, useStore } from "@/lib/store";
+import { CustomerLogin } from "@/components/auth/customer-login";
+import { useCustomer, useHydrated, useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export default function MyReservations() {
@@ -15,9 +16,10 @@ export default function MyReservations() {
   const events = useStore((s) => s.events);
   const spaces = useStore((s) => s.spaces);
   const reservations = useStore((s) => s.reservations);
+  const customer = useCustomer();
 
   const mine = reservations
-    .filter((r) => r.mine && r.status !== "expirada")
+    .filter((r) => !!customer && r.customerId === customer.id && r.status !== "expirada")
     .map((r) => ({ r, ev: events.find((e) => e.id === r.eventId), sp: spaces.find((s) => s.id === r.spaceId) }))
     .filter((x) => x.ev)
     .sort((a, b) => a.ev!.startsAt.localeCompare(b.ev!.startsAt));
@@ -30,6 +32,10 @@ export default function MyReservations() {
 
       {!hydrated ? (
         <div className="mt-6 h-40 animate-pulse rounded-2xl bg-white/5" />
+      ) : !customer ? (
+        <div className="glass mx-auto mt-6 max-w-sm rounded-3xl p-6">
+          <CustomerLogin title="Entre na sua conta" subtitle="Suas reservas e os QR Codes ficam guardados na sua conta." onDone={() => {}} />
+        </div>
       ) : mine.length === 0 ? (
         <div className="glass mt-6 rounded-2xl p-8 text-center">
           <Ticket className="mx-auto size-8 text-muted-foreground" />

@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { AlertTriangle, ArrowLeft, Camera, CameraOff, CheckCircle2, QrCode, Search, Wifi, WifiOff, XCircle } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Camera, CameraOff, CheckCircle2, LogOut, QrCode, Search, Wifi, WifiOff, XCircle } from "lucide-react";
+import { StaffGuard } from "@/components/auth/staff-guard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { time } from "@/lib/format";
-import { isConfirmed, ticketToken, useHydrated, useStore, type CheckinResult } from "@/lib/store";
+import { isConfirmed, ticketToken, useHydrated, useStaff, useStore, type CheckinResult } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const Scanner = dynamic(() => import("@yudiel/react-qr-scanner").then((m) => m.Scanner), { ssr: false });
@@ -61,12 +63,22 @@ function ResultOverlay({ result, onClose }: { result: CheckinResult; onClose: ()
 }
 
 export default function DoorPage() {
+  return (
+    <StaffGuard>
+      <Door />
+    </StaffGuard>
+  );
+}
+
+function Door() {
   const hydrated = useHydrated();
   const events = useStore((s) => s.events);
   const spaces = useStore((s) => s.spaces);
   const reservations = useStore((s) => s.reservations);
   const offlineQueue = useStore((s) => s.offlineQueue);
   const { checkIn, checkInManual } = useStore.getState();
+  const staff = useStaff();
+  const router = useRouter();
 
   const upcoming = useMemo(() => [...events].filter((e) => e.status === "published").sort((a, b) => a.startsAt.localeCompare(b.startsAt)), [events]);
   const [eventId, setEventId] = useState(upcoming[0]?.id ?? "");
@@ -102,9 +114,22 @@ export default function DoorPage() {
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col px-4 pt-3 pb-6">
       <header className="flex items-center gap-2">
-        <Link href="/painel" aria-label="Voltar ao painel" className="grid size-10 place-items-center rounded-xl bg-white/5">
-          <ArrowLeft className="size-4" />
-        </Link>
+        {staff?.role === "portaria" ? (
+          <button
+            onClick={() => {
+              useStore.getState().signOutStaff();
+              router.replace("/equipe/entrar");
+            }}
+            aria-label="Sair"
+            className="grid size-10 place-items-center rounded-xl bg-white/5"
+          >
+            <LogOut className="size-4" />
+          </button>
+        ) : (
+          <Link href="/painel" aria-label="Voltar ao painel" className="grid size-10 place-items-center rounded-xl bg-white/5">
+            <ArrowLeft className="size-4" />
+          </Link>
+        )}
         <div className="flex-1">
           <p className="font-display text-xl leading-tight">Portaria INN</p>
           <select
