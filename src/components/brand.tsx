@@ -21,6 +21,32 @@ export function InnLogo({ className, href = "/", sub = true }: { className?: str
   );
 }
 
+/**
+ * Logo grande da abertura. Provisório em tipografia condensada; quando a casa
+ * enviar o arquivo oficial, basta colocá-lo em public/ e definir LOGO_SRC.
+ */
+const LOGO_SRC: string | null = null;
+
+export function InnWordmark({ className }: { className?: string }) {
+  if (LOGO_SRC) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- arquivo estático do logo, sem otimização necessária
+      <img src={LOGO_SRC} alt="INN Lounge Bar" className={cn("mx-auto h-[1em] w-auto", className)} />
+    );
+  }
+  return (
+    <h1 className={cn("flex flex-col items-center leading-none", className)}>
+      <span className="font-display leading-[0.8] tracking-[0.02em] text-white" aria-hidden>
+        INN
+      </span>
+      <span className="mt-[0.08em] pl-[0.55em] text-[0.11em] font-medium tracking-[0.55em] text-white/80 uppercase [font-family:var(--font-sans)]" aria-hidden>
+        Lounge Bar
+      </span>
+      <span className="sr-only">INN Lounge Bar</span>
+    </h1>
+  );
+}
+
 /** Fios de luz verdes, como os pendurados entre as plantas da casa. */
 export function StringLights({ className }: { className?: string }) {
   return (

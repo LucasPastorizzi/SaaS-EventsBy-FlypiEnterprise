@@ -2,10 +2,9 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowRight, CalendarCheck, ChevronDown, Clock, ListChecks, MapPin, MessageCircle, QrCode, ShieldCheck, Sparkles, Users } from "lucide-react";
-import { StringLights } from "@/components/brand";
+import { ArrowRight, AtSign, CalendarCheck, ChevronDown, Clock, ListChecks, MapPin, MessageCircle, QrCode, ShieldCheck, Users } from "lucide-react";
+import { InnWordmark } from "@/components/brand";
 import { Flyer } from "@/components/flyer";
-import { StatusLegend, VenueMap } from "@/components/venue/venue-map";
 import { fullDate, time, weekday } from "@/lib/format";
 import { statusOf, useHydrated, useStore } from "@/lib/store";
 
@@ -30,77 +29,72 @@ export function HomePage() {
   const freeOf = (eventId: string) => camarotes.filter((s) => statusOf(eventId, s.id, reservations, blocks) === "disponivel").length;
 
   return (
-    <div className="bg-noise">
-      {/* Hero */}
+    <div>
+      {/* Hero: identidade do INN com o logo grande */}
       <section className="relative isolate overflow-hidden">
-        <div
+        {/* preto e branco, como o logo do INN: fundo preto e um facho de luz branco bem suave */}
+        <div className="absolute inset-0 -z-10 bg-black" />
+        <motion.div
           aria-hidden
-          className="absolute inset-0 -z-10 opacity-[0.07]"
-          style={{ backgroundImage: "repeating-linear-gradient(90deg, var(--wood) 0 2px, transparent 2px 46px)" }}
+          className="absolute -top-56 left-1/2 -z-10 h-[640px] w-[150%] -translate-x-1/2 bg-[conic-gradient(from_180deg_at_50%_0%,transparent_40%,rgb(255_255_255/0.10)_50%,transparent_60%)] blur-2xl"
+          animate={{ rotate: [-6, 6, -6] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
         />
-        <StringLights className="absolute inset-x-0 top-0 -z-10 h-16 w-full opacity-80" />
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-16 pb-14 md:grid-cols-[1fr_1.05fr] md:pt-24 md:pb-20">
-          <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs tracking-wide text-muted-foreground">
-              <Sparkles className="size-3.5 text-primary" /> Reserva oficial de camarotes
-            </p>
-            <h1 className="mt-5 font-display text-6xl leading-[0.95] md:text-8xl">
-              Seu camarote
-              <br />
-              <span className="text-primary [text-shadow:0_0_40px_color-mix(in_oklch,var(--primary)_55%,transparent)]">no INN</span>
-            </h1>
-            <p className="mt-5 max-w-md text-lg text-muted-foreground">{venue.tagline} Escolha o camarote no mapa, mande a lista da sua turma e entre com QR Code.</p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <a
-                href="#noites"
-                className="inline-flex h-12 items-center gap-2 rounded-xl bg-primary px-6 font-semibold text-primary-foreground shadow-[0_0_40px_-8px_var(--primary)] transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
-              >
-                Ver noites disponíveis <ArrowRight className="size-4" />
-              </a>
-              <a
-                href={`https://wa.me/${venue.whatsapp}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="glass inline-flex h-12 items-center gap-2 rounded-xl px-5 font-medium transition hover:border-white/25"
-              >
-                <MessageCircle className="size-4" /> Falar com a casa
-              </a>
-            </div>
-            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="size-4" /> {venue.address} · {venue.district}
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Clock className="size-4" /> {venue.hours}
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <ShieldCheck className="size-4" /> +{venue.minAge}
-              </span>
-            </div>
+        <div aria-hidden className="absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-background" />
+
+        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pt-20 pb-16 text-center md:pt-28 md:pb-24">
+          <motion.div initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.7, ease: "easeOut" }}>
+            <InnWordmark className="text-[10.5rem] sm:text-[12rem] md:text-[15rem]" />
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mt-6 max-w-lg text-lg text-white/70 md:text-xl"
+          >
+            {venue.tagline}
+          </motion.p>
+
+          <div className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-white/55">
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="size-4" /> {venue.address} · {venue.district}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="size-4" /> {venue.hours}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <ShieldCheck className="size-4" /> +{venue.minAge}
+            </span>
+          </div>
+
+          <div className="mt-8 flex items-center gap-2">
+            <a
+              href="#noites"
+              className="inline-flex h-12 items-center gap-2 rounded-xl bg-white px-6 font-semibold text-black transition hover:bg-white/85 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none"
+            >
+              Reservar camarote <ArrowRight className="size-4" />
+            </a>
+            <a href={`https://instagram.com/${venue.instagram}`} target="_blank" rel="noopener noreferrer" aria-label="Instagram do INN" className="grid size-12 place-items-center rounded-xl border border-white/20 transition hover:border-white/60">
+              <AtSign className="size-5" />
+            </a>
+            <a href={`https://wa.me/${venue.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp do INN" className="grid size-12 place-items-center rounded-xl border border-white/20 transition hover:border-white/60">
+              <MessageCircle className="size-5" />
+            </a>
           </div>
 
           {next && (
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="relative">
-              <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-[var(--violet)]/30 to-[var(--primary)]/15 blur-3xl" />
-              <div className="glass rounded-3xl p-3">
-                <div className="flex items-center justify-between px-2 pt-1 pb-3">
-                  <div>
-                    <p className="font-display text-xl">{next.name}</p>
-                    <p className="text-xs text-muted-foreground">{fullDate(next.startsAt)} · Salão</p>
-                  </div>
-                  <span className="flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-xs text-primary">
-                    <span className="size-1.5 animate-pulse rounded-full bg-current" /> ao vivo
-                  </span>
-                </div>
-                <VenueMap map={maps[0]} spaces={spaces.filter((s) => s.mapId === maps[0].id)} statusFor={(s) => statusOf(next.id, s.id, reservations, blocks)} />
-                <div className="flex flex-wrap items-center justify-between gap-2 px-2 pt-3 pb-1">
-                  <StatusLegend />
-                  <Link href={`/noite/${next.slug}`} className="text-sm font-semibold text-primary hover:underline">
-                    Escolher camarote →
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
+            <Link
+              href={`/noite/${next.slug}`}
+              className="mt-6 inline-flex items-center gap-2.5 rounded-2xl border border-white/15 px-4 py-2 text-left text-sm transition hover:border-white/50"
+            >
+              <span className="size-2 shrink-0 animate-pulse rounded-full bg-white" />
+              <span>
+                <span className="block text-xs text-muted-foreground">Próxima noite</span>
+                <span className="font-medium">{next.name}</span>
+                <span className="text-muted-foreground"> · {fullDate(next.startsAt)}</span>
+              </span>
+              <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+            </Link>
           )}
         </div>
       </section>

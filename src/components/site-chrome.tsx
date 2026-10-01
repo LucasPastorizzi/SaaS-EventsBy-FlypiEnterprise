@@ -5,7 +5,7 @@ import { VENUE } from "@/lib/mock-data";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/5 bg-background/75 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
         <InnLogo className="text-base" />
         <nav className="flex items-center gap-2">
@@ -18,7 +18,7 @@ export function SiteHeader() {
           </Link>
           <Link
             href="/#noites"
-            className="hidden h-9 items-center rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none sm:inline-flex"
+            className="hidden h-9 items-center rounded-full bg-white px-4 text-sm font-semibold text-black transition hover:bg-white/85 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none sm:inline-flex"
           >
             Reservar camarote
           </Link>
