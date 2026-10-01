@@ -17,6 +17,7 @@ import { countdown, fullDate, hideCpf, maskCpf, maskPhone } from "@/lib/format";
 import { statusOf, uid, useHydrated, useStore } from "@/lib/store";
 import type { Guest, Space } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { EventPhotos } from "./event-photos";
 import { SpacePanel } from "./space-panel";
 
 type Step = "camarote" | "dados" | "lista" | "revisao";
@@ -249,6 +250,7 @@ export function BookingFlow({ eventSlug }: { eventSlug: string }) {
                 <span className="size-1.5 animate-pulse rounded-full bg-primary" /> atualizando ao vivo
               </p>
             </div>
+            <EventPhotos photos={event.photos ?? []} title={event.name} />
           </div>
 
           {/* painel lateral (desktop) */}

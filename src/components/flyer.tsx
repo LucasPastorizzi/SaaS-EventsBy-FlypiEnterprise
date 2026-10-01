@@ -2,8 +2,21 @@ import { cn } from "@/lib/utils";
 import type { EventItem } from "@/lib/types";
 import { day, month } from "@/lib/format";
 
-/** Flyer gerado (sem imagem): gradiente da noite + padrão + tipografia. */
+/**
+ * Flyer da noite. Se a casa enviou uma imagem real (event.cover), ela é usada;
+ * senão, um flyer desenhado: gradiente da noite + padrão + tipografia.
+ */
 export function Flyer({ event, className, size = "md" }: { event: EventItem; className?: string; size?: "sm" | "md" | "lg" }) {
+  if (event.cover) {
+    const showTitle = event.coverShowTitle ?? true;
+    return (
+      <div className={cn("relative isolate overflow-hidden bg-black", className)} aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element -- data URL local; com Storage vira next/image */}
+        <img src={event.cover} alt="" className="absolute inset-0 -z-10 size-full object-cover" />
+        {showTitle ? <Overlay event={event} size={size} /> : null}
+      </div>
+    );
+  }
   const { from, via, to, motif } = event.flyer;
   return (
     <div
@@ -42,6 +55,14 @@ export function Flyer({ event, className, size = "md" }: { event: EventItem; cla
             [60, 400, 50],
           ].map(([cx, cy, r], i) => <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke="white" strokeWidth="2" />)}
       </svg>
+      <Overlay event={event} size={size} />
+    </div>
+  );
+}
+
+function Overlay({ event, size }: { event: EventItem; size: "sm" | "md" | "lg" }) {
+  return (
+    <>
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
       <div className={cn("flex h-full flex-col justify-between p-4 text-white", size === "lg" && "p-6 md:p-8")}>
         <div className="flex items-start justify-between">
@@ -65,6 +86,6 @@ export function Flyer({ event, className, size = "md" }: { event: EventItem; cla
           {size !== "sm" && <p className="mt-2 line-clamp-1 text-xs text-white/75">{event.lineup.map((l) => l.name).join(" · ")}</p>}
         </div>
       </div>
-    </div>
+    </>
   );
 }

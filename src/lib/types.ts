@@ -77,8 +77,12 @@ export interface EventItem {
   status: "draft" | "published" | "cancelled" | "finished";
   flyer: { from: string; via: string; to: string; motif: "waves" | "grid" | "orbs" | "leaves" };
   recurring?: string;
-  /** camarotes liberados para reserva online nesta noite (vazio = todos) */
-  note?: string;
+  /** imagem real enviada pela casa (data URL comprimida); substitui o flyer desenhado */
+  cover?: string;
+  /** mostrar nome e data por cima da imagem (desligar quando a arte já tem o texto) */
+  coverShowTitle?: boolean;
+  /** fotos reais da noite, exibidas na página da noite */
+  photos?: string[];
 }
 
 export interface Guest {

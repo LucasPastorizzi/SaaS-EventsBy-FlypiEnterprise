@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Ban, Copy, Pencil, Plus, Repeat } from "lucide-react";
+import { Ban, Copy, Images, Pencil, Plus, Repeat } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/admin-shell";
+import { CoverPicker, PhotosPicker } from "@/components/admin/event-images";
 import { Flyer } from "@/components/flyer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -110,9 +111,18 @@ export default function EventsPage() {
                       </div>
                     ))}
                   </div>
-                  {e.recurring && (
-                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Repeat className="size-3.5" /> {e.recurring}
+                  {(e.recurring || !!e.photos?.length) && (
+                    <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                      {e.recurring && (
+                        <span className="inline-flex items-center gap-1.5">
+                          <Repeat className="size-3.5" /> {e.recurring}
+                        </span>
+                      )}
+                      {!!e.photos?.length && (
+                        <span className="inline-flex items-center gap-1.5">
+                          <Images className="size-3.5" /> {e.photos.length} {e.photos.length === 1 ? "foto" : "fotos"}
+                        </span>
+                      )}
                     </p>
                   )}
                   <div className="flex gap-2">
@@ -177,23 +187,27 @@ function EventDialog({ event, onClose }: { event: EventItem; onClose: () => void
         <DialogHeader>
           <DialogTitle>{isNew ? "Nova noite" : `Editar ${event.name}`}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 sm:grid-cols-[160px_1fr]">
-          <div className="space-y-2">
-            <Flyer event={{ ...e, name: e.name || "Sua noite" }} size="sm" className="aspect-[3/4] rounded-xl" />
-            <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Estilo do flyer">
-              {FLYERS.map((f, i) => (
-                <button
-                  key={i}
-                  role="radio"
-                  aria-checked={e.flyer.from === f.from && e.flyer.motif === f.motif}
-                  aria-label={`Estilo ${i + 1}`}
-                  onClick={() => setE({ ...e, flyer: f })}
-                  className={cn("size-6 rounded-full ring-offset-2 ring-offset-background", e.flyer.from === f.from && e.flyer.motif === f.motif && "ring-2 ring-primary")}
-                  style={{ background: `linear-gradient(135deg, ${f.from}, ${f.via})` }}
-                />
-              ))}
-            </div>
-            <p className="text-xs text-muted-foreground">Na versão final, a casa envia a arte do flyer.</p>
+        <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
+          <div className="space-y-3">
+            <CoverPicker event={e} onChange={(patch) => setE({ ...e, ...patch })} />
+            {!e.cover && (
+              <div>
+                <p className="mb-1.5 text-xs text-muted-foreground">Ou um estilo de flyer desenhado:</p>
+                <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Estilo do flyer">
+                  {FLYERS.map((f, i) => (
+                    <button
+                      key={i}
+                      role="radio"
+                      aria-checked={e.flyer.from === f.from && e.flyer.motif === f.motif}
+                      aria-label={`Estilo ${i + 1}`}
+                      onClick={() => setE({ ...e, flyer: f })}
+                      className={cn("size-6 rounded-full ring-offset-2 ring-offset-background", e.flyer.from === f.from && e.flyer.motif === f.motif && "ring-2 ring-primary")}
+                      style={{ background: `linear-gradient(135deg, ${f.from}, ${f.via})` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <div className="space-y-3">
             <div className="space-y-1.5">
@@ -244,6 +258,7 @@ function EventDialog({ event, onClose }: { event: EventItem; onClose: () => void
             </div>
           </div>
         </div>
+        <PhotosPicker photos={e.photos ?? []} onChange={(photos) => setE({ ...e, photos })} />
         <DialogFooter className="gap-2">
           {e.status !== "published" && (
             <Button variant="outline" onClick={() => save("draft")}>

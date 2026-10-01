@@ -6,6 +6,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { toast } from "sonner";
 import { EVENTS, MAPS, SPACES, VENUE, randomName, seeded } from "./mock-data";
 import type { EventItem, Guest, Reservation, Space, SpaceStatus, Venue, VenueMap } from "./types";
 
@@ -301,9 +302,25 @@ export const useStore = create<State>()(
       // no servidor não há storage: o estado salvo só entra no navegador (ver useHydrated)
       storage: createJSONStorage(() => {
         if (typeof window === "undefined") throw new Error("sem localStorage no servidor");
-        return window.localStorage;
+        return {
+          getItem: (k) => window.localStorage.getItem(k),
+          removeItem: (k) => window.localStorage.removeItem(k),
+          setItem: (k, v) => {
+            try {
+              window.localStorage.setItem(k, v);
+            } catch {
+              // imagens ocupam espaço; sem backend o limite é o do navegador (~5 MB)
+              toast.error("Sem espaço para salvar no navegador. Remova algumas fotos das noites.", { id: "storage-full" });
+            }
+          },
+        };
       }),
       skipHydration: true,
+      // dados salvos por versões anteriores ganham campos novos de venue
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<State>;
+        return { ...current, ...p, venue: { ...current.venue, ...p.venue } };
+      },
       partialize: (s) => ({
         venue: s.venue,
         maps: s.maps,
