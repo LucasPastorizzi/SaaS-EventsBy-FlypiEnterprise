@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:movve": "NEXT_PUBLIC_BRAND=movve next dev --port 3001",
     "build": "next build",
+    "build:movve": "NEXT_PUBLIC_BRAND=movve next build",
     "start": "next start",
     "lint": "eslint"
   },

@@ -7,6 +7,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { toast } from "sonner";
+import { BRAND } from "@/brand";
 import { hashPassword, onlyDigits, signOutMarker } from "./auth";
 import { EVENTS, MAPS, SPACES, STAFF, VENUE, randomName, seeded } from "./mock-data";
 import type { CustomerAccount, EventItem, Guest, Reservation, Space, SpaceStatus, StaffUser, Venue, VenueMap } from "./types";
@@ -21,19 +22,20 @@ const code = () => Math.random().toString(36).slice(2, 8).toUpperCase();
 /** Assinatura de demonstração. No backend real é HMAC-SHA256 com segredo no servidor. */
 export function signTicket(id: string, nonce: string) {
   let h = 0;
-  for (const c of `${id}.${nonce}.inn-demo`) h = (Math.imul(31, h) + c.charCodeAt(0)) | 0;
+  for (const c of `${id}.${nonce}.${BRAND.id}-demo`) h = (Math.imul(31, h) + c.charCodeAt(0)) | 0;
   return (h >>> 0).toString(36);
 }
 export const ticketToken = (r: Reservation) => `${r.id}.${r.ticketNonce}.${signTicket(r.id, r.ticketNonce)}`;
 
 function seedReservations(): Reservation[] {
   const list: Reservation[] = [];
-  const occupancy: Record<string, number> = { e_sexta: 0.45, e_sabado: 0.65, e_rooftop: 0.2 };
-  for (const ev of EVENTS) {
+  // ocupação de exemplo por noite, na ordem em que aparecem
+  const occupancy = [0.45, 0.65, 0.2];
+  for (const [i, ev] of EVENTS.entries()) {
     const rand = seeded(ev.id);
     for (const s of SPACES) {
       if (!s.bookable || s.id === "r5") continue;
-      if (rand() > occupancy[ev.id]) continue;
+      if (rand() > (occupancy[i] ?? 0.3)) continue;
       const name = randomName(rand);
       const party = Math.max(4, Math.round(s.capacity * (0.5 + rand() * 0.5)));
       const pending = rand() < 0.25;
@@ -135,7 +137,8 @@ const initial = () => ({
   spaces: SPACES,
   events: EVENTS,
   reservations: seedReservations(),
-  blocks: { e_sexta: ["r5"], e_sabado: [], e_rooftop: [] } as Record<string, string[]>,
+  // na primeira noite, o Rooftop VIP começa bloqueado (uso da casa)
+  blocks: (EVENTS[0] ? { [EVENTS[0].id]: ["r5"] } : {}) as Record<string, string[]>,
   offlineQueue: 0,
   customers: [] as CustomerAccount[],
   staff: STAFF,
@@ -375,7 +378,7 @@ export const useStore = create<State>()(
       resetDemo: () => set((s) => ({ ...initial(), staffSession: s.staffSession, customers: s.customers, customerSession: s.customerSession })),
     }),
     {
-      name: "inn-reservas-demo",
+      name: BRAND.storageKey,
       version: 1,
       // no servidor não há storage: o estado salvo só entra no navegador (ver useHydrated)
       storage: createJSONStorage(() => {

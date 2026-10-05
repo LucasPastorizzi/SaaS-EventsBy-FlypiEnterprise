@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { CalendarDays, ExternalLink, LayoutDashboard, LogOut, Map, Menu, ScanLine, Settings, Ticket } from "lucide-react";
-import { InnLogo } from "@/components/brand";
+import { BrandLogo } from "@/components/brand";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { StaffGuard } from "@/components/auth/staff-guard";
 import { ROLE_LABEL, canAccess } from "@/lib/auth";
@@ -29,7 +29,7 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col">
       <div className="px-4 pt-5 pb-1">
-        <InnLogo href="/painel" className="text-base" />
+        <BrandLogo href="/painel" className="text-base" />
       </div>
       <p className="mb-4 px-4 text-xs text-muted-foreground">Painel de reservas</p>
       <nav className="flex-1 space-y-0.5 px-3" aria-label="Painel">
@@ -98,7 +98,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <button onClick={() => setOpen(true)} aria-label="Abrir menu" className="grid size-9 place-items-center rounded-lg hover:bg-white/5">
             <Menu className="size-5" />
           </button>
-          <InnLogo href="/painel" className="text-sm" />
+          <BrandLogo href="/painel" className="text-sm" />
         </header>
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetContent side="left" className="w-64 bg-sidebar p-0">

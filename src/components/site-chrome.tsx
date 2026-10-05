@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { AtSign, MessageCircle } from "lucide-react";
 import { AccountMenu } from "@/components/auth/account-menu";
-import { InnLogo } from "@/components/brand";
+import { BrandLogo } from "@/components/brand";
 import { VENUE } from "@/lib/mock-data";
+import { BRAND } from "@/brand";
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-black/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
-        <InnLogo className="text-base" />
+        <BrandLogo className="text-base" />
         <nav className="flex items-center gap-2">
           <AccountMenu />
           <Link
@@ -28,16 +29,16 @@ export function SiteFooter() {
     <footer className="border-t border-white/5 py-8">
       <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <InnLogo className="text-base" />
+          <BrandLogo className="text-base" />
           <p className="mt-2 text-sm text-muted-foreground">
             {VENUE.address} · {VENUE.district}, {VENUE.city}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <a href={`https://instagram.com/${VENUE.instagram}`} target="_blank" rel="noopener noreferrer" aria-label="Instagram do INN" className="grid size-10 place-items-center rounded-full border border-white/10 hover:border-white/30">
+          <a href={`https://instagram.com/${VENUE.instagram}`} target="_blank" rel="noopener noreferrer" aria-label={`Instagram ${BRAND.de}`} className="grid size-10 place-items-center rounded-full border border-white/10 hover:border-white/30">
             <AtSign className="size-4" />
           </a>
-          <a href={`https://wa.me/${VENUE.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp do INN" className="grid size-10 place-items-center rounded-full border border-white/10 hover:border-white/30">
+          <a href={`https://wa.me/${VENUE.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp ${BRAND.de}`} className="grid size-10 place-items-center rounded-full border border-white/10 hover:border-white/30">
             <MessageCircle className="size-4" />
           </a>
         </div>

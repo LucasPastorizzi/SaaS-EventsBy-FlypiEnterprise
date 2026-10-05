@@ -16,6 +16,7 @@ import { fullDate } from "@/lib/format";
 import { isActive, isConfirmed, statusOf, uid, useStore } from "@/lib/store";
 import type { EventItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { BRAND } from "@/brand";
 
 const FLYERS: EventItem["flyer"][] = [
   { from: "#22C55E", via: "#0F766E", to: "#04110B", motif: "leaves" },
@@ -212,7 +213,7 @@ function EventDialog({ event, onClose }: { event: EventItem; onClose: () => void
           <div className="space-y-3">
             <div className="space-y-1.5">
               <Label htmlFor="ev-name">Nome da noite</Label>
-              <Input id="ev-name" value={e.name} onChange={(x) => setE({ ...e, name: x.target.value })} placeholder="Sexta no INN" />
+              <Input id="ev-name" value={e.name} onChange={(x) => setE({ ...e, name: x.target.value })} placeholder={BRAND.eventNamePlaceholder} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="ev-sub">Chamada</Label>

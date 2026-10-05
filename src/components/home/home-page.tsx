@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowRight, AtSign, CalendarCheck, ChevronDown, Clock, ListChecks, MapPin, MessageCircle, QrCode, ShieldCheck, Users } from "lucide-react";
-import { InnWordmark } from "@/components/brand";
+import { BrandWordmark } from "@/components/brand";
 import { Flyer } from "@/components/flyer";
 import { fullDate, time, weekday } from "@/lib/format";
 import { statusOf, useHydrated, useStore } from "@/lib/store";
+import { BRAND } from "@/brand";
 
 const STEPS = [
   { icon: CalendarCheck, title: "Escolha a noite e o camarote", text: "Veja no mapa do salão e da cobertura quais camarotes estão livres." },
   { icon: ListChecks, title: "Mande seus dados e a lista", text: "Informe quantas pessoas vão e quem são. Dá pra mandar um link para a turma se cadastrar." },
-  { icon: QrCode, title: "Receba a confirmação", text: "A equipe do INN confirma pelo WhatsApp e o QR Code de entrada aparece em Minhas reservas." },
+  { icon: QrCode, title: "Receba a confirmação", text: `A equipe ${BRAND.de} confirma pelo WhatsApp e o QR Code de entrada aparece em Minhas reservas.` },
 ];
 
 export function HomePage() {
@@ -30,9 +31,9 @@ export function HomePage() {
 
   return (
     <div>
-      {/* Hero: identidade do INN com o logo grande */}
+      {/* Hero: identidade da marca com o logo grande */}
       <section className="relative isolate overflow-hidden">
-        {/* preto e branco, como o logo do INN: fundo preto e um facho de luz branco bem suave */}
+        {/* preto e branco, como os logos: fundo preto e um facho de luz branco bem suave */}
         <div className="absolute inset-0 -z-10 bg-black" />
         <motion.div
           aria-hidden
@@ -44,7 +45,7 @@ export function HomePage() {
 
         <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pt-20 pb-16 text-center md:pt-28 md:pb-24">
           <motion.div initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.7, ease: "easeOut" }}>
-            <InnWordmark className="text-[10.5rem] sm:text-[12rem] md:text-[15rem]" />
+            <BrandWordmark />
           </motion.div>
           <motion.p
             initial={{ opacity: 0 }}
@@ -74,10 +75,10 @@ export function HomePage() {
             >
               Reservar camarote <ArrowRight className="size-4" />
             </a>
-            <a href={`https://instagram.com/${venue.instagram}`} target="_blank" rel="noopener noreferrer" aria-label="Instagram do INN" className="grid size-12 place-items-center rounded-xl border border-white/20 transition hover:border-white/60">
+            <a href={`https://instagram.com/${venue.instagram}`} target="_blank" rel="noopener noreferrer" aria-label={`Instagram ${BRAND.de}`} className="grid size-12 place-items-center rounded-xl border border-white/20 transition hover:border-white/60">
               <AtSign className="size-5" />
             </a>
-            <a href={`https://wa.me/${venue.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp do INN" className="grid size-12 place-items-center rounded-xl border border-white/20 transition hover:border-white/60">
+            <a href={`https://wa.me/${venue.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp ${BRAND.de}`} className="grid size-12 place-items-center rounded-xl border border-white/20 transition hover:border-white/60">
               <MessageCircle className="size-5" />
             </a>
           </div>

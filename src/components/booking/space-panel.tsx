@@ -29,8 +29,8 @@ export function SpacePanel({
         className="relative h-32 overflow-hidden rounded-xl"
         style={{
           background: rooftop
-            ? "radial-gradient(circle at 70% 20%, oklch(0.7 0.18 152), oklch(0.16 0.04 165) 75%)"
-            : "radial-gradient(circle at 30% 20%, oklch(0.55 0.22 295), oklch(0.14 0.04 290) 75%)",
+            ? "radial-gradient(circle at 70% 20%, color-mix(in oklch, var(--primary) 75%, black), var(--card) 75%)"
+            : "radial-gradient(circle at 30% 20%, color-mix(in oklch, var(--violet) 65%, black), var(--card) 75%)",
         }}
       >
         <div className="absolute inset-0 opacity-25" style={{ backgroundImage: "repeating-linear-gradient(90deg, var(--wood) 0 2px, transparent 2px 22px)" }} />

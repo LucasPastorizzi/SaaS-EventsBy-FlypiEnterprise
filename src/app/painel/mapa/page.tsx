@@ -20,8 +20,8 @@ const PRESETS: { type: SpaceType; label: string; icon: React.ElementType; make: 
 ];
 
 const TYPE_COLOR: Record<SpaceType, string> = {
-  camarote: "#3FD483",
-  area: "oklch(0.55 0.15 295)",
+  camarote: "var(--st-free)",
+  area: "var(--violet)",
 };
 
 type Drag = { id: string; mode: "move" | "resize"; startX: number; startY: number; orig: Space };
@@ -177,7 +177,7 @@ export default function MapEditor() {
               </Button>
             ))}
           </div>
-          <div className="overflow-x-auto rounded-2xl border border-white/8 bg-[oklch(0.1_0.008_165)]" tabIndex={0} onKeyDown={onKey} aria-label="Área de edição do mapa">
+          <div className="overflow-x-auto rounded-2xl border border-white/8 bg-[color-mix(in_oklch,var(--background)_80%,black)]" tabIndex={0} onKeyDown={onKey} aria-label="Área de edição do mapa">
             <svg
               ref={svgRef}
               viewBox={`0 0 ${map.width} ${map.height}`}

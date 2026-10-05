@@ -128,6 +128,28 @@
   --st-blocked: oklch(0.42 0.01 165);
 }
 
+/* MOVVE: mesma base escura, com o neon rosa e ciano dos flyers no lugar do verde e do roxo */
+.dark[data-brand="movve"] {
+  --background: oklch(0.12 0.006 300);
+  --card: oklch(0.16 0.01 300);
+  --popover: oklch(0.17 0.012 300);
+  --secondary: oklch(0.22 0.014 300);
+  --muted: oklch(0.21 0.012 300);
+  --muted-foreground: oklch(0.74 0.015 300);
+  --accent: oklch(0.24 0.02 300);
+  --primary: oklch(0.72 0.26 340);
+  --primary-foreground: oklch(0.13 0.02 340);
+  --ring: oklch(0.72 0.26 340);
+  --chart-1: oklch(0.72 0.26 340);
+  --sidebar: oklch(0.14 0.009 300);
+  --sidebar-primary: oklch(0.72 0.26 340);
+  --sidebar-primary-foreground: oklch(0.13 0.02 340);
+  --sidebar-accent: oklch(0.22 0.014 300);
+  --sidebar-ring: oklch(0.72 0.26 340);
+  --violet: oklch(0.82 0.14 210);
+  --st-free: oklch(0.82 0.14 210);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

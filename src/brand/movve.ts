@@ -1,0 +1,135 @@
+// Marca MOVVE: festa que acontece no INN Lounge Bar (mesmo local, mesmos
+// camarotes). A data da MOVVE Blackout (09/10, 3 anos) vem da bio e do flyer
+// oficiais; as edições seguintes e os line-ups são de demonstração.
+import { brt, iso } from "./dates";
+import type { BrandConfig } from "./types";
+
+const blackout = brt(2026, 10, 9, 22);
+const novembro = brt(2026, 11, 13, 22);
+const dezembro = brt(2026, 12, 11, 22);
+
+export const movve: BrandConfig = {
+  id: "movve",
+  name: "MOVVE",
+  short: "MOVVE",
+  de: "da MOVVE",
+  em: "na MOVVE",
+  artigo: "a MOVVE",
+  metaTitle: "MOVVE · Reserva de camarotes",
+  metaDescription: "Reserve seu camarote na MOVVE, no INN Lounge Bar em Hamburgo Velho, Novo Hamburgo. Escolha o lugar no mapa e receba o QR Code de entrada.",
+  icon: "/brand/movve.svg",
+  themeColor: "#000000",
+  chartColor: "#FF4FD8",
+  storageKey: "movve-reservas-demo",
+  venue: {
+    name: "MOVVE",
+    tagline: "All we have is now!",
+    description: "A festa que move Novo Hamburgo há 3 anos. As edições da MOVVE acontecem no INN Lounge Bar, em Hamburgo Velho: garanta o camarote da sua turma e entre com QR Code.",
+    address: "R. Gen. Osório, 951",
+    district: "Hamburgo Velho",
+    city: "Novo Hamburgo · RS",
+    mapsQuery: "INN Lounge Bar, R. Gen. Osório, 951, Novo Hamburgo - RS",
+    phone: "(51) 99924-2719",
+    whatsapp: "5551999242719",
+    instagram: "movveoficial",
+    hours: "Edições no INN Lounge Bar, a partir das 22h",
+    minAge: 18,
+    rules: [
+      "Entrada somente para maiores de 18 anos, com documento original com foto.",
+      "O titular do camarote precisa chegar até 0h30. Depois disso, o camarote pode ser liberado.",
+      "Cada pessoa da lista entra com o próprio nome; leve documento.",
+      "Não é permitida a entrada com bebidas ou alimentos de fora.",
+    ],
+    faq: [
+      { q: "Onde acontece a MOVVE?", a: "No INN Lounge Bar, na R. Gen. Osório, 951, em Hamburgo Velho (Novo Hamburgo)." },
+      {
+        q: "Como funciona a reserva?",
+        a: "Você escolhe a edição e o camarote no mapa, informa seus dados e a lista de convidados. A equipe da MOVVE confirma pelo WhatsApp e o seu QR Code de entrada é liberado.",
+      },
+      { q: "Meus convidados precisam chegar juntos?", a: "Não. Cada convidado da lista entra com o nome e documento. Você também pode mandar um link para eles se cadastrarem." },
+      { q: "Posso cancelar?", a: "Sim, pelo próprio site até 24h antes da festa. Depois disso, fale com a equipe pelo WhatsApp." },
+    ],
+    holdMinutes: 10,
+    cancelHours: 24,
+    arrivalLimit: "0h30",
+  },
+  events: () => [
+    {
+      id: "e_blackout",
+      slug: "movve-blackout",
+      name: "MOVVE Blackout",
+      subtitle: "Edição de 3 anos · #3years",
+      startsAt: iso(blackout),
+      endsAt: iso(blackout, 6),
+      lineup: [
+        { name: "DJs convidados", role: "Line-up completo no Instagram", time: "23:00" },
+        { name: "Abertura", role: "Warm-up", time: "22:00" },
+      ],
+      description: "A MOVVE completa 3 anos com uma edição Blackout no INN. Luz negra, neon e a pista cheia até o fim.",
+      minAge: 18,
+      status: "published",
+      flyer: { from: "#FF2BD6", via: "#6D28D9", to: "#05030A", motif: "waves" },
+    },
+    {
+      id: "e_novembro",
+      slug: "movve-novembro",
+      name: "MOVVE",
+      subtitle: "Edição de novembro · line-up em breve",
+      startsAt: iso(novembro),
+      endsAt: iso(novembro, 6),
+      lineup: [{ name: "Line-up a anunciar", role: "", time: "22:00" }],
+      description: "Próxima edição da MOVVE no INN. Os camarotes já podem ser reservados.",
+      minAge: 18,
+      status: "published",
+      flyer: { from: "#22D3EE", via: "#2563EB", to: "#03060F", motif: "grid" },
+    },
+    {
+      id: "e_dezembro",
+      slug: "movve-fim-de-ano",
+      name: "MOVVE Fim de Ano",
+      subtitle: "Edição especial de dezembro",
+      startsAt: iso(dezembro),
+      endsAt: iso(dezembro, 6),
+      lineup: [{ name: "Line-up a anunciar", role: "", time: "22:00" }],
+      description: "A última MOVVE do ano, no INN.",
+      minAge: 18,
+      status: "published",
+      flyer: { from: "#F5F5F5", via: "#6B7280", to: "#030303", motif: "orbs" },
+    },
+  ],
+  eventNamePlaceholder: "MOVVE Blackout",
+  staff: [
+    {
+      id: "st_dono",
+      name: "Dono da MOVVE",
+      email: "dono@movve.demo",
+      role: "dono",
+      passwordHash: "38cf18de02c6aa38de681f61b1ed8485bbea8f72b7b5c2514ba359214ae8b0da",
+      active: true,
+      createdAt: "2026-01-01T00:00:00.000Z",
+    },
+    {
+      id: "st_gerente",
+      name: "Produção",
+      email: "gerente@movve.demo",
+      role: "gerente",
+      passwordHash: "8182bdd96b2c2fd219d04662d3537cfdd28f8624f1f6fc9c632ebdcf79c97270",
+      active: true,
+      createdAt: "2026-01-01T00:00:00.000Z",
+    },
+    {
+      id: "st_portaria",
+      name: "Equipe da entrada",
+      email: "portaria@movve.demo",
+      role: "portaria",
+      passwordHash: "f6da15f75cbee13d5a0488083d00d4302c6719986d9cec8ebe03a92175d37c40",
+      active: true,
+      createdAt: "2026-01-01T00:00:00.000Z",
+    },
+  ],
+  demoLogins: [
+    { role: "dono", email: "dono@movve.demo", password: "MovveDono#2026" },
+    { role: "gerente", email: "gerente@movve.demo", password: "MovveGerente#2026" },
+    { role: "portaria", email: "portaria@movve.demo", password: "MovvePortaria#2026" },
+  ],
+};

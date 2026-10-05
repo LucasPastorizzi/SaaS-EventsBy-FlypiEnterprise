@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import { toast } from "sonner";
-import { InnLogo } from "@/components/brand";
+import { BrandLogo } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,7 +71,7 @@ export function StaffSignIn() {
     <main className="flex min-h-screen items-center justify-center bg-black px-4 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <InnLogo href="/" className="text-2xl" />
+          <BrandLogo href="/" className="text-2xl" />
           <p className="mt-3 text-sm text-muted-foreground">Acesso da equipe</p>
         </div>
 

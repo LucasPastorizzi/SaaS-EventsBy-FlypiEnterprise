@@ -15,6 +15,7 @@ import { STATUS_LABEL } from "@/lib/labels";
 import { CustomerLogin } from "@/components/auth/customer-login";
 import { isActive, ticketToken, uid, useCustomer, useHydrated, useStaff, useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { BRAND } from "@/brand";
 
 function Burst() {
   return (
@@ -106,7 +107,7 @@ export function TicketView({ id }: { id: string }) {
             <Check className="size-7" strokeWidth={3} />
           </div>
           <h1 className="font-display text-4xl">Solicitação enviada!</h1>
-          <p className="mt-1 text-sm text-muted-foreground">A equipe do INN vai confirmar no seu WhatsApp, {r.holderPhone}.</p>
+          <p className="mt-1 text-sm text-muted-foreground">A equipe {BRAND.de} vai confirmar no seu WhatsApp, {r.holderPhone}.</p>
         </motion.div>
       )}
 
@@ -147,7 +148,7 @@ export function TicketView({ id }: { id: string }) {
               <Hourglass className="mt-0.5 size-5 shrink-0 text-[var(--st-hold)]" />
               <div>
                 <p className="font-semibold">Aguardando a confirmação da casa</p>
-                <p className="mt-0.5 text-muted-foreground">O QR Code de entrada aparece aqui assim que o INN confirmar. Normalmente leva poucas horas.</p>
+                <p className="mt-0.5 text-muted-foreground">O QR Code de entrada aparece aqui assim que {BRAND.artigo} confirmar. Normalmente leva poucas horas.</p>
               </div>
             </div>
           ) : (
@@ -233,7 +234,7 @@ export function TicketView({ id }: { id: string }) {
           variant="ghost"
           className="gap-2"
           onClick={() => {
-            if (navigator.share) navigator.share({ title: event.name, text: `Bora pro ${space.label} no INN!`, url: inviteLink }).catch(() => {});
+            if (navigator.share) navigator.share({ title: event.name, text: `Bora pro ${space.label} ${BRAND.em}!`, url: inviteLink }).catch(() => {});
             else toast.info("Compartilhamento não disponível neste navegador.");
           }}
         >

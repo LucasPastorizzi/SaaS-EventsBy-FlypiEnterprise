@@ -12,6 +12,7 @@ import { maskPhone } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import type { CustomerAccount } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { BRAND } from "@/brand";
 
 type Channel = "whatsapp" | "email";
 type Step = "contato" | "codigo" | "cadastro";
@@ -59,7 +60,7 @@ export function CustomerLogin({ onDone, title = "Entrar", subtitle }: { onDone: 
       setCode("");
       setStep("codigo");
       setBusy(false);
-      toast(`${channel === "whatsapp" ? "WhatsApp" : "E-mail"} (simulado): seu código do INN é ${c}`, {
+      toast(`${channel === "whatsapp" ? "WhatsApp" : "E-mail"} (simulado): seu código ${BRAND.de} é ${c}`, {
         description: "Na versão final, o código chega de verdade e não aparece aqui.",
         duration: 15_000,
       });
@@ -194,7 +195,7 @@ export function CustomerLogin({ onDone, title = "Entrar", subtitle }: { onDone: 
           </label>
           <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
             <Checkbox checked={marketing} onCheckedChange={(v) => setMarketing(!!v)} className="mt-0.5" />
-            <span>Quero receber a programação do INN pelo WhatsApp (opcional).</span>
+            <span>Quero receber a programação {BRAND.de} pelo WhatsApp (opcional).</span>
           </label>
           <Button type="submit" className="h-12 w-full text-base" disabled={name.trim().length < 3 || !terms}>
             Criar conta e continuar

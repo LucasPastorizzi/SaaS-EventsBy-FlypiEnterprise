@@ -40,7 +40,7 @@ export function VenueMap({ map, spaces, statusFor, selectedId, mineId, onSelect,
   const { ref, view, handlers, wasDrag, zoomIn, zoomOut, reset } = usePanZoom(map.width, map.height);
 
   return (
-    <div className={cn("relative overflow-hidden rounded-2xl border bg-[oklch(0.1_0.008_165)]", className)}>
+    <div className={cn("relative overflow-hidden rounded-2xl border bg-[color-mix(in_oklch,var(--background)_80%,black)]", className)}>
       <div
         ref={ref}
         {...handlers}
@@ -102,7 +102,7 @@ export function VenueMap({ map, spaces, statusFor, selectedId, mineId, onSelect,
                 const cx = s.x + s.w / 2;
                 const cy = s.y + s.h / 2;
                 const common = {
-                  fill: `color-mix(in oklch, ${color} ${selected || mine ? 55 : 22}%, oklch(0.16 0.015 290))`,
+                  fill: `color-mix(in oklch, ${color} ${selected || mine ? 55 : 22}%, var(--card))`,
                   stroke: selected || mine ? "var(--violet)" : color,
                   strokeWidth: selected || mine ? 4 : 2,
                 };

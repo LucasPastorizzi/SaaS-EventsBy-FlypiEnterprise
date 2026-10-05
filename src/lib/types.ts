@@ -1,4 +1,4 @@
-// Tipos do domínio. Pensados para o INN Lounge Bar: reserva de camarotes,
+// Tipos do domínio: reserva de camarotes (INN Lounge Bar e MOVVE),
 // sem valores — a casa recebe a solicitação, confirma e o cliente entra com QR Code.
 
 /** "camarote" é reservável; "area" é só referência visual no mapa (palco, pista, bar...). */

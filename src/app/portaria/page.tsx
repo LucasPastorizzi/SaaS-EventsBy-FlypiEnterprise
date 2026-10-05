@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { time } from "@/lib/format";
 import { isConfirmed, ticketToken, useHydrated, useStaff, useStore, type CheckinResult } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { BRAND } from "@/brand";
 
 const Scanner = dynamic(() => import("@yudiel/react-qr-scanner").then((m) => m.Scanner), { ssr: false });
 
@@ -131,7 +132,7 @@ function Door() {
           </Link>
         )}
         <div className="flex-1">
-          <p className="font-display text-xl leading-tight">Portaria INN</p>
+          <p className="font-display text-xl leading-tight">Portaria {BRAND.short}</p>
           <select
             aria-label="Evento"
             value={eventId}

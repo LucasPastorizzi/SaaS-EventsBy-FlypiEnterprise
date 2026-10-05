@@ -15,6 +15,7 @@ import { STATUS_LABEL } from "@/lib/labels";
 import { isActive, useStore } from "@/lib/store";
 import type { Reservation } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { BRAND } from "@/brand";
 
 const selectCls =
   "h-9 rounded-lg border border-input bg-transparent px-2.5 text-sm text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&>option]:bg-popover";
@@ -66,7 +67,7 @@ export default function ReservationsPage() {
     const blob = new Blob(["﻿" + [header.join(";"), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `reservas-inn-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `reservas-${BRAND.id}-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(a.href);
   };

@@ -21,6 +21,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { EventPhotos } from "./event-photos";
 import { SpacePanel } from "./space-panel";
+import { BRAND } from "@/brand";
 
 type Step = "camarote" | "dados" | "lista" | "revisao";
 const STEPS: { key: Step; label: string }[] = [
@@ -448,7 +449,7 @@ export function BookingFlow({ eventSlug }: { eventSlug: string }) {
                   ))}
                 </dl>
                 <p className="rounded-xl bg-[var(--violet)]/10 p-3 text-sm">
-                  A equipe do INN analisa a solicitação e confirma pelo WhatsApp. O QR Code de entrada aparece em <strong>Minhas reservas</strong> assim que for confirmado. O titular precisa chegar até {venue.arrivalLimit}.
+                  A equipe {BRAND.de} analisa a solicitação e confirma pelo WhatsApp. O QR Code de entrada aparece em <strong>Minhas reservas</strong> assim que for confirmado. O titular precisa chegar até {venue.arrivalLimit}.
                 </p>
                 <Button className="hidden h-12 w-full text-base font-semibold md:flex" onClick={send}>
                   Enviar solicitação de reserva

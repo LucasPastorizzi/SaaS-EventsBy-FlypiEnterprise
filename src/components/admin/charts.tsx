@@ -1,11 +1,12 @@
 "use client";
 
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { BRAND } from "@/brand";
 
-/** Série única: verde do INN (passa contraste ≥ 3:1 sobre o card escuro). */
-const SERIES = "#3FD483";
+/** Série única na cor da marca (contraste ≥ 3:1 sobre o card escuro). */
+const SERIES = BRAND.chartColor;
 
-const axis = { stroke: "oklch(1 0 0 / 0%)", tick: { fill: "oklch(0.74 0.015 160)", fontSize: 11 }, tickLine: false };
+const axis = { stroke: "oklch(1 0 0 / 0%)", tick: { fill: "var(--muted-foreground)", fontSize: 11 }, tickLine: false };
 
 export function ReservationsChart({ data }: { data: { label: string; value: number }[] }) {
   return (
