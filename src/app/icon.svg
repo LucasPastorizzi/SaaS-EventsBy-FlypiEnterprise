@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Ícone da aba: "INN" em branco sobre preto, no estilo condensado do logo -->
+  <rect width="64" height="64" rx="12" fill="#000"/>
+  <g fill="#fff">
+    <rect x="8" y="14" width="6" height="36"/>
+    <path d="M19 14H24L30 36V14H35V50H30L24 28V50H19Z"/>
+    <path d="M39 14H44L50 36V14H55V50H50L44 28V50H39Z"/>
+  </g>
+</svg>
