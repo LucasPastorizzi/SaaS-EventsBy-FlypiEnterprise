@@ -6,6 +6,24 @@ O cliente escolhe a noite, vê o **mapa do salão e da cobertura** com os camaro
 
 > **Fase atual: só front-end.** Não há banco nem backend ainda. Os dados são de demonstração (line-ups e nomes de clientes fictícios) e ficam no `localStorage` do navegador. Cada ação de `src/lib/store.ts` corresponde a uma rota/RPC do backend futuro.
 
+## Duas marcas, um código
+
+O mesmo app serve duas marcas no mesmo local (INN Lounge Bar, R. Gen. Osório, 951):
+
+| Marca | Comando | Endereço local |
+|---|---|---|
+| **INN Lounge Bar** (padrão) | `npm run dev` | http://localhost:3000 |
+| **MOVVE** (festa que acontece no INN) | `npm run dev:movve` | http://localhost:3001 |
+
+A marca é escolhida pela variável `NEXT_PUBLIC_BRAND` (`inn` ou `movve`). Mapa, camarotes, reservas, painel, portaria e logins são os mesmos; mudam nome, logo, cores, textos, contatos e noites. Cada marca guarda os próprios dados no navegador e compila na própria pasta, então as duas rodam ao mesmo tempo.
+
+- Configuração de cada marca: `src/brand/inn.ts` e `src/brand/movve.ts`
+- Cores da MOVVE: bloco `[data-brand="movve"]` em `src/app/globals.css`
+- Logos e ícones: `src/components/brand.tsx` e `public/brand/`
+- Para publicar, crie um projeto na Vercel por marca, com `NEXT_PUBLIC_BRAND` definida (`build:movve` faz o build da MOVVE)
+
+Na MOVVE, a data da **MOVVE Blackout (09/10, 3 anos)** vem do Instagram oficial; as outras edições, os line-ups e o WhatsApp (por enquanto o do INN) são de demonstração e precisam ser confirmados com eles.
+
 ## Rodando localmente
 
 ```bash
@@ -13,7 +31,7 @@ npm install
 npm run dev
 ```
 
-Abra http://localhost:3000.
+Abra http://localhost:3000 (ou `npm run dev:movve` para a MOVVE em http://localhost:3001).
 
 ## Telas
 
@@ -56,7 +74,9 @@ O dono cadastra, troca o perfil, desativa ou remove acessos em **Configurações
 | Gerente | gerente@inn.demo | InnGerente#2026 |
 | Portaria | portaria@inn.demo | InnPortaria#2026 |
 
-A tela de login também tem botões "Entrar como". Para tirá-los, deixe `DEMO_STAFF_LOGINS` vazio em `src/lib/mock-data.ts`.
+Na versão MOVVE, os e-mails terminam em `@movve.demo` e as senhas são `MovveDono#2026`, `MovveGerente#2026` e `MovvePortaria#2026`.
+
+A tela de login também tem botões "Entrar como". Para tirá-los, deixe `demoLogins` vazio na configuração da marca (`src/brand/`).
 
 > **Atenção:** sem backend, contas e sessões ficam no navegador. Isso organiza a demonstração, mas **não protege de verdade** o painel. Antes de colocar no ar, o login precisa ir para o servidor (Supabase Auth com OTP para clientes, e-mail e senha para a equipe, proxy do Next e RLS no banco).
 
@@ -65,7 +85,7 @@ A tela de login também tem botões "Entrar como". Para tirá-los, deixe `DEMO_S
 Use só fotos oficiais, com autorização do INN.
 
 - **Imagem e fotos de cada noite**: em **Painel → Noites → Editar**.
-- **Logo oficial**: coloque o arquivo em `public/` e defina `LOGO_SRC` em `src/components/brand.tsx`.
+- **Logo oficial**: coloque o arquivo em `public/brand/` e aponte em `LOGO_SRC` (por marca) em `src/components/brand.tsx`.
 
 Enquanto não há backend, o que é enviado pelo painel fica salvo só no navegador de quem enviou.
 
